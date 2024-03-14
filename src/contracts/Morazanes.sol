@@ -9,19 +9,26 @@ contract Morazan is ERC20 {
 
     event FeeTransferred(address indexed feeWallet, uint256 amount);
 
-    constructor(address payable feeWallet) ERC20("Morazan", "MZN") {
-        _mint(msg.sender, 21000000000000000000000);
-        _feeWallet = feeWallet;
-        _feePercentage = 15;
+    constructor() ERC20("Morazan", "MZN") {
+        // Esta wallet puede ser una wallet donde vayan los gobiernos del estado.
+        // Por ahora es una wallet provisional.
+        _feeWallet = payable(0x2E21ebbd5df6413E2300b51Fc4514093A3887CFD);
     }
 
-    function transfer(address recipient, uint256 amount) public override returns (bool) {
-        uint256 feeAmount = (amount * _feePercentage) / 100;
-        //uint256 amountAfterFee = amount - feeAmount;
-        
+    function faucet() public {
+        _mint(msg.sender, 1500 ether);
+    }
+
+    function payWithISV(
+        address recipient,
+        uint256 amount
+    ) public returns (bool) {
+        // 12% impuesto sobre venta
+        uint256 feeAmount = (amount * 12) / 100;
+
         super.transfer(recipient, amount);
         super.transfer(_feeWallet, feeAmount);
-        
+
         return true;
     }
 }
